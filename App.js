@@ -1,5 +1,5 @@
 import "react-native-gesture-handler";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useIsFocused } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
@@ -15,41 +15,55 @@ import { MaterialIcons } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-    // Between main or welcome page
-    const [display, setDisplay] = useState(1);
-
     return (
         <NavigationContainer>
             <Tab.Navigator
                 initialRouteName="Home"
                 tabBarOptions={{
-                    activeBackgroundColor: "#46F8C1",
-                    activeTintColor: "black",
-                    inactiveTintColor: "black",
-                    inactiveBackgroundColor: "white",
+                    activeBackgroundColor: "none",
+                    activeTintColor: "#46F8C1",
+                    inactiveTintColor: "white",
+                    inactiveBackgroundColor: "#011F4B",
                     labelStyle: { fontSize: 14 },
+                    style: { backgroundColor: "#011F4B", borderTopWidth: 0 },
                 }}
             >
                 <Tab.Screen
                     name="Home"
                     component={HomeScreen}
                     options={{
-                        tabBarIcon: () => <Ionicons name="home" size={24} />,
+                        tabBarIcon: ({ focused }) => (
+                            <Ionicons
+                                name="home"
+                                size={24}
+                                color={focused ? "#46F8C1" : "white"}
+                            />
+                        ),
                     }}
                 />
                 <Tab.Screen
                     name="Play"
                     component={GameScreen}
                     options={{
-                        tabBarIcon: () => <Ionicons name="play" size={26} />,
+                        tabBarIcon: ({ focused }) => (
+                            <Ionicons
+                                name="play"
+                                size={26}
+                                color={focused ? "#46F8C1" : "white"}
+                            />
+                        ),
                     }}
                 />
                 <Tab.Screen
                     name="Leaderboards"
                     component={Leaderboards}
                     options={{
-                        tabBarIcon: () => (
-                            <MaterialIcons name="leaderboard" size={26} />
+                        tabBarIcon: ({ focused }) => (
+                            <MaterialIcons
+                                name="leaderboard"
+                                size={26}
+                                color={focused ? "#46F8C1" : "white"}
+                            />
                         ),
                     }}
                 />
@@ -57,8 +71,12 @@ export default function App() {
                     name="Submit"
                     component={SubmitScreen}
                     options={{
-                        tabBarIcon: () => (
-                            <MaterialIcons name="post-add" size={26} />
+                        tabBarIcon: ({ focused }) => (
+                            <MaterialIcons
+                                name="post-add"
+                                size={26}
+                                color={focused ? "#46F8C1" : "white"}
+                            />
                         ),
                     }}
                 />
