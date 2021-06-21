@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -9,7 +9,6 @@ import {
     TouchableOpacity,
     StatusBar,
 } from "react-native";
-import { withSafeAreaInsets } from "react-native-safe-area-context";
 
 const placeHolderData = [
     {
@@ -24,22 +23,12 @@ const placeHolderData = [
     },
     {
         id: 2,
-        title: "What is poop",
-        correct_answer: "Food after digestion",
+        title: "What is Question 2 placehodler",
+        correct_answer: "Answer1",
         incorrect_answer: [
-            "Web App Development framework",
-            "poppop",
-            "asdasdasdasd",
-        ],
-    },
-    {
-        id: 3,
-        title: "What is pee",
-        correct_answer: "asdasdasdasd",
-        incorrect_answer: [
-            "fdsgdfsgsdfgdsfg",
-            "sdfgdsfgsdfg",
-            "sdfgsdfgdsfgdsfg",
+            "Answer2",
+            "Answer3",
+            "Answer4",
         ],
     },
 ];
@@ -50,31 +39,39 @@ const GameScreen = () => {
     const [count, setCount] = useState(0);
     const [data, setData] = useState([]);
     // Here we will push the random question from the data array and then render it.
-    const [currentQuestion, setCurrentQuestion] = useState({
-        id: 2,
-        title: "What is poop",
-        correct_answer: "Food after digestion",
-        incorrect_answer: [
-            "Web App Development framework",
-            "poppop",
-            "asdasdasdasd",
-        ],
-    },);
-
-    const formatQuestion = () => {
-        let final = [];
-        const q = [];
-        q.push(currentQuestion.correct_answer);
-        currentQuestion.incorrect_answer.forEach(item => q.push(item));
-        console.log(q);
-        return q;
-    };
+    const [currentQuestion, setCurrentQuestion] = useState();
+    const [nextButton, setNextButton] = useState(false);
 
     const startGame = () => {
         if (user.length > 0) {
             setDisplay(true);
         }
     };
+
+    useEffect(() => {
+        setCurrentQuestion(placeHolderData[count]);
+    }, [count]);
+
+    const handleNewQuestion = () => {
+        let answers = [];
+        answers.push(currentQuestion.correct_answer);
+        currentQuestion.incorrect_answer.map((item) => answers.push(item));
+        return answers;
+    };
+
+    const handleCorrectAnswer = (item) => {
+        if (item === currentQuestion.correct_answer) {
+            setNextButton(true);
+        } else {
+            console.log("wrong");
+        }
+    };
+
+    const handleNextButton = () => {
+        setCount(count + 1); 
+        setNextButton(false);
+    }
+
 
     return (
         <SafeAreaView style={styles.gameContainer}>
@@ -95,17 +92,36 @@ const GameScreen = () => {
                                 fontSize: 26,
                             }}
                         >
-                            What is React Native Used for?
+                            {currentQuestion.title}
                         </Text>
                     </View>
-                    <View style={{flex: 0.55, justifyContent: "space-evenly", alignItems: "center"}}>
-                        {formatQuestion().map((item) => (
-                           <TouchableOpacity style={game.answerBox}>
-                               <Text style={game.answerP}>{item}</Text>
-                           </TouchableOpacity>
+                    <View
+                        style={{
+                            flex: 0.55,
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
+                        }}
+                    >
+                        {handleNewQuestion().map((item) => (
+                            <TouchableOpacity
+                                style={game.answerBox}
+                                key={item}
+                                onPress={() => handleCorrectAnswer(item)}
+                            >
+                                <Text style={game.answerP}>{item}</Text>
+                            </TouchableOpacity>
                         ))}
                     </View>
-                    <Button onPress={() => formatQuestion()} title="Check"/>
+                    {nextButton ? (
+                        <View style={{flex: 0.1,}}>
+                            <Text style={{fontSize: 24, textAlign: "center", color: "#46F8C1"}}>Correct Answer!</Text>
+                            <Button
+                                style={{}}
+                                title="Next Question"
+                                onPress={() => handleNextButton()}
+                            />
+                        </View>
+                    ) : null}
                 </View>
             ) : (
                 <View style={styles.inputContainer}>
@@ -199,7 +215,7 @@ const game = StyleSheet.create({
         letterSpacing: 1,
     },
     questionCard: {
-        flex: 0.35,
+        flex: 0.30,
         width: "92.5%",
         backgroundColor: "#013074",
         marginLeft: "auto",
@@ -227,6 +243,6 @@ const game = StyleSheet.create({
         color: "white",
         fontSize: 18,
         textAlign: "center",
-    }
+    },
 });
 export default GameScreen;
