@@ -25,11 +25,7 @@ const placeHolderData = [
         id: 2,
         title: "What is Question 2 placehodler",
         correct_answer: "Answer1",
-        incorrect_answer: [
-            "Answer2",
-            "Answer3",
-            "Answer4",
-        ],
+        incorrect_answer: ["Answer2", "Answer3", "Answer4"],
     },
 ];
 
@@ -41,7 +37,9 @@ const GameScreen = () => {
     // Here we will push the random question from the data array and then render it.
     const [currentQuestion, setCurrentQuestion] = useState();
     const [nextButton, setNextButton] = useState(false);
-
+    const [restartButton, setRestartButton] = useState(false);
+    const [clicked, setClicked] = useState(false);
+    
     const startGame = () => {
         if (user.length > 0) {
             setDisplay(true);
@@ -58,20 +56,32 @@ const GameScreen = () => {
         currentQuestion.incorrect_answer.map((item) => answers.push(item));
         return answers;
     };
-
+    
     const handleCorrectAnswer = (item) => {
-        if (item === currentQuestion.correct_answer) {
-            setNextButton(true);
-        } else {
-            console.log("wrong");
+        if (clicked === false) {
+            for (let i = 0; i < currentQuestion.incorrect_answer.length; i++) {
+                if (item === currentQuestion.incorrect_answer[i]) {
+                    setRestartButton(true);
+                    setClicked(true);
+                }
+            }
+        }
+        if (clicked === false) {
+            if (item === currentQuestion.correct_answer) {
+                setNextButton(true);
+                setClicked(true);
+            }
         }
     };
 
     const handleNextButton = () => {
-        setCount(count + 1); 
+        setCount(count + 1);
         setNextButton(false);
-    }
+        setClicked(false);
+    };
 
+    const handleRestart = () => {
+    };
 
     return (
         <SafeAreaView style={styles.gameContainer}>
@@ -106,18 +116,47 @@ const GameScreen = () => {
                             <TouchableOpacity
                                 style={game.answerBox}
                                 key={item}
-                                onPress={() => handleCorrectAnswer(item)}
+                                onPress={() => {
+                                    handleCorrectAnswer(item);
+                                    console.log(item);
+                                }}
                             >
                                 <Text style={game.answerP}>{item}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
                     {nextButton ? (
-                        <View style={{flex: 0.1,}}>
-                            <Text style={{fontSize: 24, textAlign: "center", color: "#46F8C1"}}>Correct Answer!</Text>
+                        <View style={{ flex: 0.1 }}>
+                            <Text
+                                style={{
+                                    fontSize: 24,
+                                    textAlign: "center",
+                                    color: "#46F8C1",
+                                }}
+                            >
+                                Correct Answer!
+                            </Text>
                             <Button
                                 style={{}}
                                 title="Next Question"
+                                onPress={() => handleNextButton()}
+                            />
+                        </View>
+                    ) : null}
+                    {restartButton ? (
+                        <View style={{ flex: 0.1 }}>
+                            <Text
+                                style={{
+                                    fontSize: 24,
+                                    textAlign: "center",
+                                    color: "#46F8C1",
+                                }}
+                            >
+                                Wrong Answer!
+                            </Text>
+                            <Button
+                                style={{}}
+                                title="Restart"
                                 onPress={() => handleNextButton()}
                             />
                         </View>
@@ -215,7 +254,7 @@ const game = StyleSheet.create({
         letterSpacing: 1,
     },
     questionCard: {
-        flex: 0.30,
+        flex: 0.3,
         width: "92.5%",
         backgroundColor: "#013074",
         marginLeft: "auto",
