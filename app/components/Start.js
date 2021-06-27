@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
     View,
     Text,
     TextInput,
     TouchableOpacity,
     StyleSheet,
+    Button,
 } from "react-native";
+import { fetchQuestions } from "../util/Api";
 
 const Start = (props) => {
+    useEffect(() => {
+        const fetchData = async () => {
+            const questions = await fetchQuestions();
+            props.setData(questions);
+        };
+        fetchData();
+    }, []);
+
     return (
         <View style={styles.inputContainer}>
             <Text style={styles.text}>
@@ -15,8 +25,10 @@ const Start = (props) => {
             </Text>
             <TextInput
                 style={styles.input}
-                value={props.user}
-                onChangeText={props.setUser}
+                value={props.playerValues.user}
+                onChangeText={(text) =>
+                    props.setPlayerValues({ ...props.playerValues, user: text })
+                }
                 placeholder="name here"
             />
             <TouchableOpacity

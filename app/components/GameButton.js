@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Button, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 
 const GameButton = (props) => {
     const nextButton = () => {
@@ -28,9 +28,14 @@ const GameButton = (props) => {
                             borderRadius: 10,
                             marginTop: 10,
                         }}
-                        onPress={() => props.handleNextButton()}
+                        onPress={() => {
+                            props.handleQuestion();
+                            props.handleNextButton();
+                        }}
                     >
-                        <Text style={{ color: "black", fontSize: 20 }}>Next Question</Text>
+                        <Text style={{ color: "black", fontSize: 20 }}>
+                            Next Question
+                        </Text>
                     </TouchableOpacity>
                 </View>
             );
@@ -40,7 +45,7 @@ const GameButton = (props) => {
     const restartButton = () => {
         if (props.restartButton === true) {
             return (
-                <View style={{ flex: 0.14, }}>
+                <View style={{ flex: 0.14 }}>
                     <Text
                         style={{
                             fontSize: 24,
@@ -65,7 +70,9 @@ const GameButton = (props) => {
                         }}
                         onPress={() => props.handleRestart()}
                     >
-                        <Text style={{ color: "black", fontSize: 20 }}>Restart Game</Text>
+                        <Text style={{ color: "black", fontSize: 20 }}>
+                            Restart Game
+                        </Text>
                     </TouchableOpacity>
                 </View>
             );

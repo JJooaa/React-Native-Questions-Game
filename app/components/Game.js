@@ -3,13 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
 import GameButton from "./GameButton";
 
 const Game = (props) => {
-    let i;
-    for (i = 0; i < props.currentQuestion.incorrect_answer.length; i++);
     return (
         <View style={game.questionContainer}>
             <View style={game.headerContainer}>
-                <Text style={game.headerP}>{props.user}</Text>
-                <Text style={game.headerP}>{`Score ${props.count}`}</Text>
+                <Text style={game.headerP}>{props.playerValues.user}</Text>
+                <Text
+                    style={game.headerP}
+                >{`Score ${props.playerValues.score}`}</Text>
             </View>
 
             <View style={game.questionCard}>
@@ -31,12 +31,12 @@ const Game = (props) => {
                     alignItems: "center",
                 }}
             >
-                {props.handleNewQuestion().map((item) => (
+                {props.currentAnswers.map((item) => (
                     <TouchableOpacity
                         disabled={props.clicked ? true : false}
                         style={
-                            props.clicked &&
-                            props.currentQuestion.correct_answer === item
+                            props.nextButton &&
+                            props.currentQuestion.correctAnswer === item
                                 ? game.answerBox2
                                 : game.answerBox
                         }
@@ -47,12 +47,12 @@ const Game = (props) => {
                     </TouchableOpacity>
                 ))}
             </View>
-
             <GameButton
                 handleNextButton={props.handleNextButton}
                 nextButton={props.nextButton}
                 restartButton={props.restartButton}
                 handleRestart={props.handleRestart}
+                handleQuestion={props.handleQuestion}
             />
         </View>
     );

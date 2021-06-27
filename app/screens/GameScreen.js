@@ -1,71 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StyleSheet, SafeAreaView, StatusBar } from "react-native";
 import Game from "../components/Game";
 import Start from "../components/Start";
 import WrongAnswer from "../components/WrongAnswer";
-
-const placeHolderData = [
-    {
-        id: 1,
-        title: "What is React Native?",
-        correct_answer: "Mobile App Development framework",
-        incorrect_answer: [
-            "Web App Development framework",
-            "123nice",
-            "asjldhasd123",
-        ],
-    },
-    {
-        id: 2,
-        title: "What is Question 2?",
-        correct_answer: "Answer1",
-        incorrect_answer: ["Answer2", "Answer3", "Answer4"],
-    },
-];
+import shuffle from "shuffle-array";
 
 const GameScreen = () => {
     const [display, setDisplay] = useState(0);
-    const [user, setUser] = useState("");
-    const [count, setCount] = useState(0);
+    const [playerValues, setPlayerValues] = useState({
+        user: "",
+        score: 0,
+    });
     const [data, setData] = useState([]);
-    // Here we will push the random question from the data array and then render it.
     const [currentQuestion, setCurrentQuestion] = useState();
     const [nextButton, setNextButton] = useState(false);
     const [restartButton, setRestartButton] = useState(false);
     const [clicked, setClicked] = useState(false);
+    const [currentAnswers, setCurrentAnswers] = useState([]);
 
-    // Checks user name and starts game
     const startGame = () => {
-        if (user.match(/^[a-zA-Z0-9]/)) {
+        if (playerValues.user.match(/^[a-zA-Z0-9]/)) {
+            handleQuestion();
             setDisplay(1);
         }
     };
 
-    // Fetch new question
-    useEffect(() => {
-        setCurrentQuestion(placeHolderData[count]);
-    }, [count]);
-
-    // Handles a new question
-    const handleNewQuestion = () => {
-        let answers = [];
-        answers.push(currentQuestion.correct_answer);
-        currentQuestion.incorrect_answer.map((item) => answers.push(item));
-        return answers;
+    const handleQuestion = () => {
+        let currQ = data.pop();
+        setCurrentQuestion(currQ);
+        setCurrentAnswers(
+            shuffle([...currQ.incorrectAnswer, currQ.correctAnswer])
+        );
     };
 
-    //Handles answer, checks if correct or incorrect answer
     const handleCorrectAnswer = (item) => {
         if (!clicked) {
-            for (let i = 0; i < currentQuestion.incorrect_answer.length; i++) {
-                if (item === currentQuestion.incorrect_answer[i]) {
+            for (let i = 0; i < currentQuestion.incorrectAnswer.length; i++) {
+                if (item === currentQuestion.incorrectAnswer[i]) {
                     setRestartButton(true);
                     setClicked(true);
                 }
             }
         }
         if (!clicked) {
-            if (item === currentQuestion.correct_answer) {
+            if (item === currentQuestion.correctAnswer) {
+                setPlayerValues((prevState) => ({
+                    ...prevState,
+                    score: (prevState.score += 1),
+                }));
                 setNextButton(true);
                 setClicked(true);
             }
@@ -73,35 +55,57 @@ const GameScreen = () => {
     };
 
     const handleNextButton = () => {
-        setCount(count + 1);
         setNextButton(false);
         setClicked(false);
     };
 
     const handleRestart = () => {
         setDisplay(2);
+        setClicked(false);
+        setRestartButton(false);
+    };
+
+    const handleHardRestart = () => {
+        setDisplay(0);
+        setPlayerValues((prevState) => ({
+            ...prevState,
+            score: 0,
+        }));
     };
 
     return (
         <SafeAreaView style={styles.gameContainer}>
             {display === 0 ? (
-                <Start user={user} setUser={setUser} startGame={startGame} />
+                <Start
+                    playerValues={playerValues}
+                    setPlayerValues={setPlayerValues}
+                    startGame={startGame}
+                    setData={setData}
+                    data={data}
+                    currentQuestion={currentQuestion}
+                    currentAnswers={currentAnswers}
+                />
             ) : null}
             {display === 1 ? (
                 <Game
-                    user={user}
-                    count={count}
+                    playerValues={playerValues}
                     currentQuestion={currentQuestion}
-                    handleNewQuestion={handleNewQuestion}
+                    handleQuestion={handleQuestion}
                     handleCorrectAnswer={handleCorrectAnswer}
                     nextButton={nextButton}
                     handleNextButton={handleNextButton}
                     restartButton={restartButton}
                     clicked={clicked}
                     handleRestart={handleRestart}
+                    currentAnswers={currentAnswers}
                 />
             ) : null}
-            {display === 2 ? <WrongAnswer /> : null}
+            {display === 2 ? (
+                <WrongAnswer
+                    handleHardRestart={handleHardRestart}
+                    playerValues={playerValues}
+                />
+            ) : null}
         </SafeAreaView>
     );
 };
